@@ -22,7 +22,7 @@ module.exports={
         {link:"http://vietnamnet.vn/rss/goc-nhin-thang.rss "}
     ],
     laodong:[
-        {link:"https://laodong.vn/rss/home.rss"},
+        {link: "https://laodong.vn/rss/home.rss"},
         {link:"https://laodong.vn/rss/xa-hoi.rss"},
         {link:"https://laodong.vn/rss/thoi-su.rss"},
         {link:"https://laodong.vn/rss/cong-doan.rss"},
