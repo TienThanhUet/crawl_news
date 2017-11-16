@@ -1,0 +1,5 @@
+let index=0;
+module.exports= function getindex() {
+    index++;
+    return index;
+}
