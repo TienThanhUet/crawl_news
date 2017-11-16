@@ -15,9 +15,11 @@ var TinTucService=require('../service/tinTucSerivce')
 var relativeValue = require('../config/relativeValue');
 
 var formatDatetimeValue;
+var paramContent;
 module.exports={
-    feed:function (url,formateDtValue) {
+    feed:function (url,formateDtValue,pContent) {
         formatDatetimeValue =formateDtValue;
+        paramContent=pContent;
         async.waterfall([
             function (callback) {
                 callback(null,url)
@@ -112,7 +114,7 @@ function parseGetContentItem(entry,callback) {
                 });
                 var content ="";
                 try{
-                    content= $('#ArticleContent >p').text();
+                    content= $(paramContent).text();
                 }catch (err){}
                 callback(null,content);
             }

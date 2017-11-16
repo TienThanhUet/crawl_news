@@ -34,8 +34,11 @@ app.use(function(req, res, next) {
 
 var constant = require('./config/constant');
 var parseRss= require("./crawl/parseRSS");
-constant.vietnamnet.forEach(rsslink=>{
-    parseRss.feed(rsslink.link,"DD-MM-YYYY")
+// constant.vietnamnet.forEach(rsslink=>{
+//     parseRss.feed(rsslink.link,"DD-MM-YYYY",'#ArticleContent >p')
+// })
+constant.laodong.forEach(rsslink=>{
+  parseRss.feed(rsslink.link,null,".article-content > p")
 })
 // parseRss.feed("http://dantri.com.vn/trangchu.rss")
 
