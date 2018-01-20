@@ -11,7 +11,7 @@ var fs= require('fs');
 var path = require('path')
 var moment = require('moment');
 
-var TinTucService=require('../service/tinTucSerivce')
+var articleService=require('../service/articleSerivce')
 var relativeValue = require('../config/relativeValue');
 
 var formatDatetimeValue;
@@ -40,47 +40,54 @@ module.exports={
                 callback("err",null)
             }
         ],function (err,parsed) {
-            // console.log(parsed)
-            console.log("done parse");
             if(!err){
                 var arrNews=[];
                 parsed.forEach(function(entry) {
                     /**
                      * entry include title, link, description, content, date
                      */
-                    if(!entry.content)
-                        entry.content=""
+                    if(!entry.contentClean)
+                        entry.contentClean=""
                     if(!entry.contentSnippet)
                         entry.contentSnippet=""
-                    var item ={
-                        url:entry.link,
-                        title:entry.title,
-                        description:entry.contentSnippet.replace(/[&\/\\#,+()$~%.'":*?<>{}"']/g, ' '),
-                        time:formatDatetime(entry.pubDate),
-                        content:entry.content.replace(/[&\/\\#,+()$~%.'":*?<>{}"']/g, ' ')
+                    let contentSnippet = entry.contentSnippet.replace(/[&\/\\#,+()$~%.'":*?<>{}"']/g, ' ');
+                    let contentClean = entry.contentClean.replace(/[&\/\\#,+()$~%.'":*?<>{}"']/g, ' ');
+                    let imageLink= findImageLink(entry.content)
+                    var postAt=formatDatetime(entry.pubDate)
+                    if(postAt!=null){
+                        var item ={
+                            link:entry.link,
+                            title:entry.title,
+                            description: contentSnippet,
+                            postAt:postAt,
+                            imageLink: imageLink,
+                            content: contentClean
+                        }
+                        arrNews.push(item)
                     }
-                    arrNews.push(item)
                 })
-                // InsertDatabase(arrNews);
-                var split =url.split("/");
-                // checkDirectorySync()
-                arrNews.forEach(news=>{
-                    let filename;
-                    try{
-                        filename = path.join(__dirname, 'logs', split[2]+'_'+ dateformat(news.time,"yyyy_mm_dd")+'_'+relativeValue()+".json");
-                    }catch(err){
-                        filename = path.join(__dirname, 'logs', split[2]+'_'+relativeValue()+".json");
-                    }
-                    if(typeof news !== "string") news = JSON.stringify(news);
-                    fs.writeFile(filename, news,'utf8',(err)={
-
-                    });
-                })
-                console.log("import done")
-                // callback(null,arrNews)
+                InsertDatabase(arrNews);
+                // var split =url.split("/");
+                // logfile(arrNews,split);
             } else console.log("parse rss false")
         });
     }
+}
+
+function logfile(arrNews,split) {
+    arrNews.forEach(news=>{
+        let filename;
+        try{
+            filename = path.join(__dirname, 'logs',split[2]+'_'+ dateformat(news.time,"yyyy_mm_dd"), split[2]+'_'+ dateformat(news.time,"yyyy_mm_dd")+'_'+relativeValue()+".json");
+        }catch(err){
+            filename = path.join(__dirname, 'logs',split[2]+'_'+ dateformat(news.time,"yyyy_mm_dd"), split[2]+'_'+relativeValue()+".json");
+        }
+        checkDirectorySync(path.join(__dirname, 'logs', split[2]+'_'+ dateformat(news.time,"yyyy_mm_dd")))
+        if(typeof news !== "string") news = JSON.stringify(news);
+        fs.writeFile(filename, news,'utf8',(err)=>{
+
+        });
+    })
 }
 
 function getContentAll(parsed,callback) {
@@ -103,6 +110,7 @@ function getContentAll(parsed,callback) {
 }
 
 function parseGetContentItem(entry,callback) {
+    // console.log(entry)
     async.waterfall([
             function (callback) {
                 makeRequest(entry.link,callback)
@@ -122,50 +130,61 @@ function parseGetContentItem(entry,callback) {
             if (err){
                 console.log(err);
             }
-            entry.content=content;
+            entry.contentClean=content;
             callback(null,entry);
         }
     )
 }
 
+function removeSpecialCharacter(value) {
+    value= value.replace('(GMT+7)',' ')
+    return value
+}
+
 function formatDatetime(value) {
+    value= removeSpecialCharacter(value)
     try{
         if(formatDatetimeValue)
-            return dateformat(moment(value,formatDatetimeValue),"yyyy-mm-dd HH:MM:ss");
+            return moment(value,formatDatetimeValue);
+            // return dateformat(moment(value,formatDatetimeValue),"yyyy-mm-dd HH:MM:ss")
         else
-            return dateformat(moment(value),"yyyy-mm-dd HH:MM:ss");
+            return moment(value)
+            // return dateformat(moment(value),"yyyy-mm-dd HH:MM:ss");
     }catch(err){
-        return value
+        console.log('err:' + value)
+        return null
     }
 }
 
-function InsertDatabase(result) {
-    var stack = []
-    stack.push(function (callback) {
-        callback(null, result)
+function InsertDatabase(arrNews) {
+    arrNews.forEach(news=>{
+        articleService.create(news, function (err, result) {
+            if (err) {
+                // console.log("News exist : "+news.title)
+            }
+            else {
+                // console.log("import News success")
+            }
+        })
     })
-    //make stack request to server
-    for (let i = 0; i < result.length; i++) {
-        var prototype = function (data, callback) {
-            //luu tru vao csdl
-            TinTucService.create(data[i], function (err, result) {
-                if (err) {
-                    console.log("News exist")
-                }
-                else {
-                    console.log("import News success")
-                }
-                callback(null,data);
-            })
+}
+
+function findImageLink(content) {
+    var position = content.indexOf("img");
+    var imageLink=null;
+    if(position!=-1){
+        var split=content.split('"');
+        for(p =0;p<split.length;p++){
+            if (split[p].indexOf("png") != -1) {
+                return split[p];
+            }
+            else if (split[p].indexOf("jpg") != -1) {
+                return split[p];
+            }
         }
-        stack.push(prototype)
     }
-    async.waterfall(stack, function (err, result) {
-        if (err) {
-            console.log(err);
-        }
-        console.log("import done!");
-    })
+    else
+        return imageLink;
 }
 
 function makeRequest(url,callback) {
@@ -183,9 +202,12 @@ function makeRequest(url,callback) {
 }
 
 function checkDirectorySync(directory) {
-    try {
-        fs.statSync(directory);
-    } catch(e) {
+    // try {
+    //     fs.statSync(directory);
+    // } catch(e) {
+    //
+    // }
+    if (!fs.existsSync(directory)) {
         fs.mkdirSync(directory);
     }
 }

@@ -1,5 +1,7 @@
 0 info it worked if it ends with ok
-1 verbose cli [ '/usr/bin/nodejs', '/usr/bin/npm', 'start' ]
+1 verbose cli [ '/usr/bin/nodejs',
+1 verbose cli   '/usr/lib/node_modules/npm/bin/npm-cli.js',
+1 verbose cli   'start' ]
 2 info using npm@3.10.10
 3 info using node@v6.11.1
 4 verbose run-script [ 'prestart', 'start', 'poststart' ]
@@ -7,8 +9,8 @@
 6 silly lifecycle kpdl@0.0.0~prestart: no script for prestart, continuing
 7 info lifecycle kpdl@0.0.0~start: kpdl@0.0.0
 8 verbose lifecycle kpdl@0.0.0~start: unsafe-perm in lifecycle true
-9 verbose lifecycle kpdl@0.0.0~start: PATH: /usr/lib/node_modules/npm/bin/node-gyp-bin:/media/sm/DATA/Project/Nodejs/kpdl/node_modules/.bin:/u01/app/oracle/product/11.2.0/xe/bin:/u01/app/oracle/product/11.2.0/xe/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games
-10 verbose lifecycle kpdl@0.0.0~start: CWD: /media/sm/DATA/Project/Nodejs/kpdl
+9 verbose lifecycle kpdl@0.0.0~start: PATH: /usr/lib/node_modules/npm/bin/node-gyp-bin:/media/sm/DATA/Project/Nodejs/MEDIATION/node_modules/.bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games
+10 verbose lifecycle kpdl@0.0.0~start: CWD: /media/sm/DATA/Project/Nodejs/MEDIATION
 11 silly lifecycle kpdl@0.0.0~start: Args: [ '-c', 'node ./bin/www' ]
 12 silly lifecycle kpdl@0.0.0~start: Returned: code: 1  signal: null
 13 info lifecycle kpdl@0.0.0~start: Failed to exec start script
@@ -23,9 +25,9 @@
 14 verbose stack     at maybeClose (internal/child_process.js:891:16)
 14 verbose stack     at Process.ChildProcess._handle.onexit (internal/child_process.js:226:5)
 15 verbose pkgid kpdl@0.0.0
-16 verbose cwd /media/sm/DATA/Project/Nodejs/kpdl
+16 verbose cwd /media/sm/DATA/Project/Nodejs/MEDIATION
 17 error Linux 3.19.0-32-generic
-18 error argv "/usr/bin/nodejs" "/usr/bin/npm" "start"
+18 error argv "/usr/bin/nodejs" "/usr/lib/node_modules/npm/bin/npm-cli.js" "start"
 19 error node v6.11.1
 20 error npm  v3.10.10
 21 error code ELIFECYCLE

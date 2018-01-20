@@ -4,9 +4,18 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+var mongoose = require('mongoose');
+// var MongoClient= require('mongodb').MongoClient,
+//     test= require('assert');
 
+//----router-------------
 var index = require('./routes/index');
 var users = require('./routes/users');
+
+//---comppents---------------
+var constant = require('./config/constant');
+var configSetup= require('./config/configSetup');
+var parseRss= require("./crawl/parseRSS");
 
 var app = express();
 
@@ -22,6 +31,10 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+//connect database
+mongoose.connect(configSetup.databaseURL, { useMongoClient: true });
+
+//config router
 app.use('/', index);
 app.use('/users', users);
 
@@ -32,15 +45,33 @@ app.use(function(req, res, next) {
   next(err);
 });
 
-var constant = require('./config/constant');
-var parseRss= require("./crawl/parseRSS");
 // constant.vietnamnet.forEach(rsslink=>{
 //     parseRss.feed(rsslink.link,"DD-MM-YYYY",'#ArticleContent >p')
+// })
+// constant.soha.forEach(rsslink=>{
+//     parseRss.feed(rsslink.link,null,'div.news-content >p')
+// })
+// constant.tienphong.forEach(rsslink=>{
+//     parseRss.feed(rsslink.link,null,'div#article-body p')
+// })
+// constant.vtvnews.forEach(rsslink=>{
+//     parseRss.feed(rsslink.link,null,'div.ta-justify p')
 // })
 constant.laodong.forEach(rsslink=>{
   parseRss.feed(rsslink.link,null,".article-content > p")
 })
 // parseRss.feed("http://dantri.com.vn/trangchu.rss")
+
+
+
+
+
+
+
+
+
+
+
 
 // error handler
 app.use(function(err, req, res, next) {
